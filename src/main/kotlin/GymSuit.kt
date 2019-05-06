@@ -3,36 +3,25 @@ class GymSuit {
         fun solution(n: Int, lost: IntArray, reserve: IntArray): Int {
             var reserveIndex = 0
             var unhappyFriends = 0
-            var sortedReserve = reserve.sortedArray()
-            var lender = ArrayList<Int>()
-            lost.sortedArray().forEach {
-                if (reserveIndex == sortedReserve.size)
-                    unhappyFriends++
-                reserve@ for (i in reserveIndex until sortedReserve.size) {
-                    if (lender.contains(it)) {
-                        unhappyFriends++
-                        break@reserve
-                    }
-                    if (sortedReserve[reserveIndex] == it){
+
+            var validReserveList = reserve.sortedArray().filter { !lost.contains(it) }
+            var validLostList = lost.sortedArray().filter { !reserve.contains(it) }
+
+            validLostList.forEach {
+                var borrow = false
+                reserve@ for (i in reserveIndex until validReserveList.size) {
+                    if (validReserveList[i] < it - 1) {
                         reserveIndex++
-                        break@reserve
+                        continue@reserve
                     }
-                    if (sortedReserve[i] < it - 1)
+                    if (validReserveList[i] == it - 1 || validReserveList[i] == it + 1) {
                         reserveIndex++
-                    if (sortedReserve[i] == it - 1) {
-                        reserveIndex++
-                        break@reserve
-                    }
-                    if (sortedReserve[i] == it + 1) {
-                        lender.add(sortedReserve[i])
-                        reserveIndex++
-                        break@reserve
-                    }
-                    if (sortedReserve[i] > it + 1 || i == reserve.size - 1) {
-                        unhappyFriends++
+                        borrow = true
                         break@reserve
                     }
                 }
+                if (!borrow)
+                    unhappyFriends++
             }
             return n - unhappyFriends
         }
